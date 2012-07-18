@@ -1,0 +1,9 @@
+[extensions]
+hgext.rebase =
+hgext.graphlog = 
+hgext.churn = 
+hgext.color =
+hgext.extdiff =
+
+[ui]
+username = Andrew Morrow <andrew.c.morrow@gmail.com>

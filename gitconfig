@@ -1,0 +1,5 @@
+[user]
+	name = "Andrew Morrow"
+	email = andrew.c.morrow@gmail.com
+[core]
+	excludesfile = ~/.gitignore_global
