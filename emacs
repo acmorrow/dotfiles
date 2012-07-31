@@ -86,6 +86,31 @@
 (global-set-key "\C-cn" 'next-error)
 (global-set-key "\C-cp" 'previous-error)
 
+(defun bring-up-compilation ()
+  "Brings up compilation"
+  (interactive)
+  (if (and (boundp 'compilation-last-buffer) (not (eq compilation-last-buffer nil)))
+      (set-window-buffer (selected-window) compilation-last-buffer)
+    (print "No compile window available"))
+  )
+
+(global-set-key "\C-xC" 'bring-up-compilation)
+
+;; make sure ansi sequences are filtered out (thanks to fanatoly)
+(defun acm-apply-ansi-color-current-buffer ()
+ (ansi-color-apply-on-region (point-min) (point-max) ) )
+(add-hook 'compilation-filter-hook 'acm-apply-ansi-color-current-buffer)
+
+;; ACR: auto-scroll is nice
+(setq compilation-scroll-output t)
+
+;; ACR: keep the current compile error at top of buf.
+(defun next-error-to-top ()
+  (save-window-excursion
+    (pop-to-buffer next-error-last-buffer nil t)
+    (recenter 0)))
+(add-hook 'next-error-hook 'next-error-to-top)
+
 ;; acm -- April 24th 2008 -- Protect against spurious exit
 (global-unset-key "\C-x\C-c")
 (defun confirm-exit-emacs ()
@@ -166,16 +191,6 @@
 
 ;; ACR: Nobody likes ~ files
 (setq make-backup-files nil)
-
-;; ACR: auto-scroll is nice
-(setq compilation-scroll-output t)
-
-;; ACR: keep the current compile error at top of buf.
-(defun next-error-to-top ()
-  (save-window-excursion
-    (pop-to-buffer next-error-last-buffer nil t)
-    (recenter 0)))
-(add-hook 'next-error-hook 'next-error-to-top)
 
 ;; Turn on red highlighting for characters outside of the 80 char limit
 (defun font-lock-width-keyword (width)
