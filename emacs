@@ -43,12 +43,12 @@
 
 
 (setq-default indent-tabs-mode nil)
-(setq ruby-indent-level 4)
-(setq lua-indent-level 4)
-(setq javascript-indent-level 4)
-(setq python-indent-level 4)
+(setq ruby-indent-level 2)
+(setq lua-indent-level 2)
+(setq javascript-indent-level 2)
+(setq python-indent-level 2)
 (setq c-default-style "BSD")
-(setq c-basic-offset 4)
+(setq c-basic-offset 2)
 
 (defun revert-all-buffers ()
   "Refreshes all open buffers from their respective files"
