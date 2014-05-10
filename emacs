@@ -1,9 +1,15 @@
 (custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
- '(elisp-cache-byte-compile-files t))
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(elisp-cache-byte-compile-files t)
+ '(gdb-many-windows t t)
+ '(gud-gdb-command-name "gdb -i=mi")
+ '(user-mail-address "andrew.morrow@10gen.com")
+ '(xgen-cru-auto-cc-list '())
+ '(xgen-cru-upload-custom-args (quote ("--jira_user=acm")))
+ '(xgen-cru-upload-py-path "/Users/andrew/Documents/10gen/dev/kernel-tools/codereview/upload.py"))
 
 (setq ns-command-modifier 'meta)
 
@@ -16,8 +22,13 @@
 (require 'vc-git)
 (require 'vc-svn)
 
+(global-git-gutter-mode t)
+
 (require 'color-theme)
-(color-theme-comidia)
+(add-to-list 'custom-theme-load-path "/Users/Andrew/.emacs.d/themes")
+(load-theme 'solarized t t)
+(color-theme-solarized-dark)
+;; (color-theme-comidia)
 
 ;; TODO(acm): It would be nice to re-enable this someday
 ;; (add-hook 'after-make-frame-functions 'run-after-make-frame-hooks)
@@ -32,10 +43,14 @@
 (require 'cmake-mode)
 (require 'markdown-mode)
 
-(ffap-bindings)
+;; NOTE(acm): This messes up IDO
+;; (ffap-bindings)
 
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'post-forward)
+
+(require 'iedit)
+(require 'ag)
 
 (setq inhibit-splash-screen t)
 (global-font-lock-mode t)
@@ -46,9 +61,11 @@
 (setq ruby-indent-level 2)
 (setq lua-indent-level 2)
 (setq javascript-indent-level 2)
-(setq python-indent-level 2)
+(setq python-indent-level 4)
 (setq c-default-style "BSD")
-(setq c-basic-offset 2)
+(setq c-basic-offset 4)
+;; NOTE(acm): 10gen doesn't indent in namespaces
+(c-set-offset 'innamespace 4)
 
 (defun revert-all-buffers ()
   "Refreshes all open buffers from their respective files"
@@ -67,11 +84,17 @@
 ;; show trailing whitespace
 (setq-default show-trailing-whitespace t)
 
+;; Nicer behavior when coding
+;; (electric-indent-mode 0)
+
 ;; Set up the keyboard so the delete key on both the regular keyboard
 ;; and the keypad delete the character under the cursor and to the right
 ;; under X, instead of the default, backspace behavior.
 (global-set-key [delete] 'delete-char)
 (global-set-key [kp-delete] 'delete-char)
+
+;; Disable frame kill that is too close to frame switch
+(global-unset-key (kbd "C-x 5 0"))
 
 ;; Athena: use full filename in frame titles
 ;;(setq frame-title-format (list "[" (getenv "BB_CURRENT_CLIENT") "] %b %f"))
@@ -86,15 +109,20 @@
 (global-set-key "\C-cn" 'next-error)
 (global-set-key "\C-cp" 'previous-error)
 
-(defun bring-up-compilation ()
-  "Brings up compilation"
-  (interactive)
-  (if (and (boundp 'compilation-last-buffer) (not (eq compilation-last-buffer nil)))
-      (set-window-buffer (selected-window) compilation-last-buffer)
-    (print "No compile window available"))
-  )
+;; (defun bring-up-compilation ()
+;;   "Brings up compilation"
+;;   (interactive)
+;;   (if (and (boundp 'compilation-last-buffer) (not (eq compilation-last-buffer nil)))
+;;       (set-window-buffer (selected-window) compilation-last-buffer)
+;;     (print "No compile window available"))
+;;   )
 
-(global-set-key "\C-xC" 'bring-up-compilation)
+(defun compilation-next-buffer ()
+  "Brings up next compilation buffer, or stays at current if none"
+  (interactive)
+  (set-window-buffer (selected-window) (compilation-find-buffer 't)))
+
+(global-set-key "\C-xC" 'compilation-next-buffer)
 
 ;; make sure ansi sequences are filtered out (thanks to fanatoly)
 (defun acm-apply-ansi-color-current-buffer ()
@@ -127,7 +155,8 @@
 (column-number-mode 1)
 
 ;; acm -- April 24th 2008 -- I also like iswitchb
-(iswitchb-mode 1)
+;; Trying out IDO for a while.
+;; (iswitchb-mode 1)
 
 ;; acm -- April 26th 2008 -- I hate ~ files
 (setq make-backup-files nil)
@@ -146,7 +175,9 @@
 ;; acm -- Sep 11th 2008 -- flyspell FTW - no more spelling review comments
 (autoload 'flyspell-mode "flyspell" "On-the-fly spelling checker." t)
 (add-hook 'text-mode-hook 'turn-on-flyspell)
-(add-hook 'c-mode-common-hook 'flyspell-prog-mode)
+(add-hook 'c++-mode-hook (lambda () (flyspell-prog-mode)))
+(setq flyspell-issue-message-flag nil)
+(setq flyspell-issue-welcome-flag nil)
 
 ;; acm -- May 18th 2009 - don't mess with my frames
 (setq pop-up-frames nil)
@@ -155,16 +186,21 @@
   "Sets the transparency of the frame window. 0=transparent/100=opaque"
   (interactive "nTransparency Value 0 - 100 opaque:")
   (set-frame-parameter (selected-frame) 'alpha value))
+(transparency 97)
 
 ;; TODO(acm): Still want to try this, but it was causing trouble for me
 ;; Lets try IDO mode
-;; (ido-mode 1)
-;; (setq ido-enable-flex-matching t)
-;; (setq ido-everywhere t)
+(require 'ido)
+(ido-mode 1)
+(ido-everywhere 1)
+(setq ido-enable-flex-matching t)
+(setq ido-use-filename-at-point 'guess)
+(setq ido-default-buffer-method 'selected-window)
 
 ;; ACR: setup gdb nicely
-(setq gud-gdb-command-name "gdb --annotate=3")
 (setq gdb-many-windows t)
+
+(savehist-mode 1)
 
 ;; ACR: A sort lines replacement that toggles case sensitivity off
 ;; before doing the sort, then restores it to whatever state it had
@@ -192,6 +228,13 @@
 ;; ACR: Nobody likes ~ files
 (setq make-backup-files nil)
 
+;; 10gen: More betterer displaying?
+(setq redisplay-dont-pause t)
+;;(setq redisplay-dont-pause nil)
+
+;; xgen: We call our C++ headers .h files for some reason
+(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+
 ;; Turn on red highlighting for characters outside of the 80 char limit
 (defun font-lock-width-keyword (width)
   "Return a font-lock style keyword for a string beyond width WIDTH
@@ -199,15 +242,16 @@
   `((,(format "^%s\\(.+\\)" (make-string width ?.))
      (1 font-lock-warning-face t))))
 
-(font-lock-add-keywords 'c++-mode (font-lock-width-keyword 120))
-(font-lock-add-keywords 'c-mode (font-lock-width-keyword 120))
-(font-lock-add-keywords 'python-mode (font-lock-width-keyword 120))
-(font-lock-add-keywords 'java-mode (font-lock-width-keyword 120))
-(font-lock-add-keywords 'perl-mode (font-lock-width-keyword 120))
-(font-lock-add-keywords 'sh-mode (font-lock-width-keyword 120))
-(font-lock-add-keywords 'lua-mode (font-lock-width-keyword 120))
-(font-lock-add-keywords 'ruby-mode (font-lock-width-keyword 120))
-(font-lock-add-keywords 'javascript-mode (font-lock-width-keyword 120))
+(font-lock-add-keywords 'c++-mode (font-lock-width-keyword 100))
+(font-lock-add-keywords 'c-mode (font-lock-width-keyword 100))
+(font-lock-add-keywords 'python-mode (font-lock-width-keyword 100))
+(font-lock-add-keywords 'java-mode (font-lock-width-keyword 100))
+(font-lock-add-keywords 'perl-mode (font-lock-width-keyword 100))
+(font-lock-add-keywords 'sh-mode (font-lock-width-keyword 100))
+(font-lock-add-keywords 'lua-mode (font-lock-width-keyword 100))
+(font-lock-add-keywords 'ruby-mode (font-lock-width-keyword 100))
+(font-lock-add-keywords 'javascript-mode (font-lock-width-keyword 100))
+(font-lock-add-keywords 'rust-mode (font-lock-width-keyword 100))
 
 (defun font-lock-show-tabs ()
   "Return a font-lock style keyword for tab characters."
@@ -222,6 +266,10 @@
 (font-lock-add-keywords 'lua-mode (font-lock-show-tabs))
 (font-lock-add-keywords 'ruby-mode (font-lock-show-tabs))
 (font-lock-add-keywords 'javascript-mode (font-lock-show-tabs))
+(font-lock-add-keywords 'rust-mode (font-lock-show-tabs))
+
+;; Alberto says we do this because of our 100 line length
+(setq-default fill-column 95)
 
 ;; TODO(acm): There must be a better way to do this.
 (add-hook 'c++-mode-hook
@@ -259,3 +307,16 @@
 (add-hook 'javascript-mode-hook
           (lambda ()
             (setq show-trailing-whitespace t)))
+
+(add-hook 'rust-mode-hook
+          (lambda ()
+            (setq show-trailing-whitespace t)))
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :stipple nil :background "#002b36" :foreground "#839496" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 130 :width normal :foundry "apple" :family "Consolas")))))
+(put 'downcase-region 'disabled nil)
+(put 'narrow-to-region 'disabled nil)

@@ -1,11 +1,14 @@
 # Path to your oh-my-zsh configuration.
 ZSH=$HOME/Documents/oh-my-zsh
-
+PATH=/Users/andrew/bin:/opt/local/bin:/opt/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-ZSH_THEME="robbyrussell"
+ZSH_THEME="powerline"
+POWERLINE_RIGHT_A="exit-status"
+POWERLINE_RIGHT_B="none"
+POWERLINE_NO_BLANK_LINE="true"
 
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
@@ -29,7 +32,9 @@ ZSH_THEME="robbyrussell"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(git)
+JIRA_URL=https://jira.mongodb.org
+
+plugins=(git jira zsh-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh
 

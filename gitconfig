@@ -1,5 +1,21 @@
 [user]
 	name = "Andrew Morrow"
-	email = andrew.c.morrow@gmail.com
+	email = acm@mongodb.com
+
 [core]
 	excludesfile = ~/.gitignore_global
+
+[color]
+        ui = auto
+
+[diff]
+	algorithm = histogram
+	tool = meld
+
+[rerere]
+	enabled = 1
+
+[alias]
+	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
+        rebip = rebase -i @{u}
+
