@@ -3,26 +3,111 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(clang-format-executable "/usr/local/Cellar/llvm36/3.6.0/bin/clang-format-3.6")
+ '(clang-modernize-executable "/usr/local/Cellar/llvm36/3.6.0/bin/clang-modernize-3.6")
  '(elisp-cache-byte-compile-files t)
  '(gdb-many-windows t t)
  '(gud-gdb-command-name "gdb -i=mi")
  '(user-mail-address "andrew.morrow@10gen.com")
- '(xgen-cru-auto-cc-list '())
+ '(xgen-cru-auto-cc-list (quote nil))
  '(xgen-cru-upload-custom-args (quote ("--jira_user=acm")))
- '(xgen-cru-upload-py-path "/Users/andrew/Documents/10gen/dev/kernel-tools/codereview/upload.py"))
+ '(xgen-cru-upload-py-path
+   "/Users/andrew/Documents/10gen/dev/kernel-tools/codereview/upload.py"))
 
 (setq ns-command-modifier 'meta)
 
 (require 'package)
 (package-initialize)
 (add-to-list 'package-archives
-	     '("marmalade" . "http://marmalade-repo.org/packages/"))
+            '("melpa" . "http://melpa.milkbox.net/packages/") t)
 
 (require 'vc-hg)
 (require 'vc-git)
 (require 'vc-svn)
 
+(require 'git-gutter-fringe)
+(global-linum-mode t)
 (global-git-gutter-mode t)
+(setq git-gutter-fr:side 'right-fringe)
+
+;; (require 'helm-config)
+;; (helm-mode 1)
+
+(require 'ede-compdb)
+
+;; (flycheck-define-checker c/c++-clang-tidy
+
+;;   "A C++ syntax and style checker using clang-tidy."
+
+;;   ;; :command ("/Users/andrew/foo"
+;;   ;;           "-extra-arg=-fno-color-diagnostics"    ; Do not include color codes in output
+;;   ;;           "-extra-arg=-fno-caret-diagnostics"    ; Do not visually indicate the source location
+;;   ;;           "-extra-arg=-fno-diagnostics-show-option" ; Do not show the corresponding warning group
+;;   ;;           source-original)
+
+;;   ;; :command ("/usr/local/Cellar/llvm36/3.6.0/bin/clang-tidy-3.6" source-original)
+
+;;   :command ("/Users/andrew/foo" source-original)
+
+;;   :error-patterns
+;;   ((error line-start
+;;           (message "In file included from") " " (file-name) ":" line ":"
+;;           line-end)
+;;    (info line-start (file-name) ":" line ":" column
+;;          ": note: " (optional (message)) line-end)
+;;    (warning line-start (file-name) ":" line ":" column
+;;             ": warning: " (optional (message)) line-end)
+;;    (error line-start (file-name) ":" line ":" column
+;;           ": " (or "fatal error" "error") ": " (optional (message)) line-end))
+
+;;   :error-filter
+;;   (lambda (errors)
+;;     (let ((errors (flycheck-sanitize-errors errors)))
+;;       (dolist (err errors)
+;;         ;; Clang will output empty messages for #error/#warning pragmas without
+;;         ;; messages.  We fill these empty errors with a dummy message to get
+;;         ;; them past our error filtering
+;;         (setf (flycheck-error-message err)
+;;               (or (flycheck-error-message err) "no message")))
+;;       (flycheck-fold-include-levels errors "In file included from")))
+
+;;   :modes (c-mode c++-mode))
+
+;; (add-to-list 'flycheck-checkers 'c/c++-clang-tidy)
+
+;; (ede-add-project-to-global-list
+;;  (ede-compdb-project "MongoDB"
+;;                      :file "/Users/andrew/Documents/10gen/dev/src/mongodb/SConstruct"
+;;                      :compdb-file "/Users/andrew/Documents/10gen/dev/src/mongodb/compile_commands.json"))
+
+;; (defun flycheck-compdb-setup ()
+;;   (when (and ede-object (oref ede-object compilation))
+;;     (let* ((comp (oref ede-object compilation))
+;;            (cmd (get-command-line comp)))
+
+;;       ;; Configure flycheck clang checker.
+;;       ;; TODO: configure gcc checker also
+;;       (when (string-match " -std=\\([^ ]+\\)" cmd)
+;;         (setq flycheck-clang-language-standard (match-string 1 cmd)))
+;;       (when (string-match " -stdlib=\\([^ ]+\\)" cmd)
+;;         (setq flycheck-clang-standard-library (match-string 1 cmd)))
+;;       (when (string-match " -fms-extensions " cmd)
+;;         (setq flycheck-clang-ms-extensions t))
+;;       (when (string-match " -fno-exceptions " cmd)
+;;         (setq flycheck-clang-no-exceptions t))
+;;       (when (string-match " -fno-rtti " cmd)
+;;         (setq flycheck-clang-no-rtti t))
+;;       (when (string-match " -fblocks " cmd)
+;;         (setq flycheck-clang-blocks t))
+;;       (setq flycheck-clang-includes (get-includes comp))
+;;       (setq flycheck-clang-definitions (get-defines comp))
+;;       (setq flycheck-clang-include-path (get-include-path comp t))
+;;       )))
+
+;; (add-hook 'ede-compdb-project-rescan-hook #'flycheck-compdb-setup)
+;; (add-hook 'ede-minor-mode-hook #'flycheck-compdb-setup)
+
+(add-hook 'after-init-hook #'global-flycheck-mode)
 
 (require 'color-theme)
 (add-to-list 'custom-theme-load-path "/Users/Andrew/.emacs.d/themes")
@@ -271,10 +356,16 @@
 ;; Alberto says we do this because of our 100 line length
 (setq-default fill-column 95)
 
+(setq use-dialog-box nil)
+
 ;; TODO(acm): There must be a better way to do this.
 (add-hook 'c++-mode-hook
           (lambda ()
             (setq show-trailing-whitespace t)))
+
+(add-hook 'c++-mode-hook
+          (lambda()
+            (ede-minor-mode())))
 
 (add-hook 'c-mode-hook
           (lambda ()
@@ -320,3 +411,30 @@
  '(default ((t (:inherit nil :stipple nil :background "#002b36" :foreground "#839496" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 130 :width normal :foundry "apple" :family "Consolas")))))
 (put 'downcase-region 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
+
+(setq clang-modernize-executable "/usr/local/Cellar/llvm36/3.6.0/bin/clang-modernize-3.6")
+(setq clang-tidy-executable "/usr/local/Cellar/llvm36/3.6.0/bin/clang-tidy-3.6")
+
+(defun clang-modernize-buffer ()
+  "Call clang modernize for the current buffer"
+  (interactive)
+  (shell-command
+   (format
+    "%s %s"
+    clang-modernize-executable
+    (shell-quote-argument (buffer-file-name))))
+  (revert-buffer t t t))
+
+(defun clang-tidy-buffer ()
+  "Call clang tidy -fix for the current buffer"
+  (interactive)
+  (shell-command
+   (format
+    "%s -fix %s"
+    clang-tidy-executable
+    (shell-quote-argument (buffer-file-name))))
+  (revert-buffer t t t))
+
+(global-set-key "\C-cf" 'clang-format-buffer)
+(global-set-key "\C-cm" 'clang-modernize-buffer)
+(global-set-key "\C-ct" 'clang-tidy-buffer)
