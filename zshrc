@@ -1,5 +1,5 @@
 # Path to your oh-my-zsh configuration.
-ZSH=$HOME/Documents/oh-my-zsh
+ZSH=$HOME/Documents/personal/dotfiles/oh-my-zsh
 PATH=/Users/andrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
@@ -37,5 +37,8 @@ JIRA_URL=https://jira.mongodb.org
 plugins=(git jira zsh-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh
+
+export VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python3
+[ -f /usr/local/bin/virtualenvwrapper.sh ] && source /usr/local/bin/virtualenvwrapper.sh 
 
 # Customize to your needs...

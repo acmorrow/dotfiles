@@ -3,16 +3,18 @@
 	email = acm@mongodb.com
 
 [core]
-	excludesfile = ~/.gitignore_global
+	excludesfile = /Users/acm/.gitignore_global
 
 [color]
         ui = auto
 
 [diff]
 	algorithm = histogram
+        indentHeuristic = true
+        colorMoved = default
 
 [rerere]
-	#enabled = 1
+	enabled = 1
 
 [alias]
 	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
@@ -20,7 +22,14 @@
 
 [merge]
 	tool = p4merge
+	conflictstyle = diff3
 
 [mergetool]
 	keepTemporaries = false
 	prompt = false
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path = 
+[mergetool "sourcetree"]
+	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true
