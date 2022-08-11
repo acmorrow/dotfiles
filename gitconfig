@@ -21,15 +21,5 @@
         rebip = rebase -i --onto @{u}... 
 
 [merge]
-	tool = p4merge
-	conflictstyle = diff3
+	conflictstyle = zdiff3
 
-[mergetool]
-	keepTemporaries = false
-	prompt = false
-[difftool "sourcetree"]
-	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
-	path = 
-[mergetool "sourcetree"]
-	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
-	trustExitCode = true
