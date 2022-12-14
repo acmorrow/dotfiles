@@ -1,6 +1,6 @@
 [user]
 	name = "Andrew Morrow"
-	email = acm@mongodb.com
+	email = andrew.c.morrow@gmail.com 
 
 [core]
 	excludesfile = /Users/acm/.gitignore_global
