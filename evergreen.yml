@@ -1,7 +1,0 @@
-api_server_host: http://mci-motu.10gen.cc:8080/api
-ui_server_host: https://evergreen.mongodb.com
-api_key: 8920416b39219f6006bbf7786110e901
-user: acm
-projects:
-- name: mongodb-mongo-master
-  default: true

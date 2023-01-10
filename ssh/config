@@ -1,29 +1,5 @@
 host *
-#  ControlMaster auto
-#  ControlPath ~/.ssh/tmp/%r@%h:%p
-#  ControlPersist 10m
+  ControlMaster auto
+  ControlPath ~/.ssh/tmp/%r@%h:%p
+  ControlPersist 10m
 
-Host workstation
-  User andrew
-  Hostname 10.1.19.227 
-
-Host power-dev-rhel7
-  User amorrow
-  Hostname rhel71-ppc-dev.pic.build.10gen.cc 
-
-Host power-dev-rhel8
-  User amorrow
-  Hostname rhel81-ppc-dev.pic.build.10gen.cc
-
-Host s390x-dev-rhel7
-  User amorrow
-  Hostname rhel74-z-dev.dallasisv.build.10gen.cc
-
-Host s390x-dev-rhel8
-  User amorrow
-  Hostname rhel80-z-dev.pic.build.10gen.cc
-
-Host apple-silicon-dev 
-  User dev-user 
-  Hostname macos-1100-arm64-dev.macstadium.build.10gen.cc 
-  Port 22
