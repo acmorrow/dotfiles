@@ -23,3 +23,16 @@
 [merge]
 	conflictstyle = zdiff3
 
+
+[user]
+  signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHFUSqtHum8+c8B7B/q/JGO0QEEt6+PB+EY6H1w9JCKh
+
+[gpg]
+  format = ssh
+
+[gpg "ssh"]
+  program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+
+[commit]
+  gpgsign = true
+
